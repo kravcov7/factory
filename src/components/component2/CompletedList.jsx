@@ -9,7 +9,7 @@ const CompletedList = ({ completedTasks, onClearCompleted }) => {
         {completedTasks?.map((task) => (
           <li key={task.id}>
             <span>{task?.time}</span>
-            <span>{task.description}</span>
+            <span>{task?.description}</span>
           </li>
         ))}
       </ul>

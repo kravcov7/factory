@@ -80,7 +80,7 @@ const TodoList = ({ tasks, onCompleteTask, onDeleteTask }) => {
     <div>
       <h2>Todo List</h2>
       <ul>
-        {tasks.map((task) => {
+        {tasks?.map((task) => {
           const timerValue = timers[task.id]?.time || task.time * 60;
           const timerStyle = {
             color: timerValue <= 0 ? 'red' : timerValue <= 600 ? 'yellow' : 'inherit',
