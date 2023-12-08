@@ -23,7 +23,6 @@ export default function Home() {
   };
 
   const completeTask = (taskId) => {
-    // clearInterval(timers[taskId]);
     const completedTask = tasks.find((task) => task.id === taskId);
     setCompletedTasks([...completedTasks, completedTask]);
     setTasks(tasks.filter((task) => task.id !== taskId));
@@ -38,7 +37,6 @@ export default function Home() {
   };
 
   const deleteTask = (taskId) => {
-    // clearInterval(timers[taskId]);
     localStorage.setItem(
       "tasks",
       JSON.stringify(tasks.filter((task) => task.id !== taskId))
@@ -48,7 +46,6 @@ export default function Home() {
 
   const clearCompleted = () => {
     localStorage.removeItem("completedTasks");
-
     setCompletedTasks([]);
   };
 
