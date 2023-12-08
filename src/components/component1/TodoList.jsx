@@ -5,6 +5,9 @@ const TodoList = ({ tasks, onCompleteTask, onDeleteTask }) => {
   const [timers, setTimers] = useState({});
 
   const formatTime = (timeInSeconds) => {
+    if (timeInSeconds <= 0) {
+      return "00:00";
+    }
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes < 10 ? "0" : ""}${minutes}:${
@@ -13,13 +16,14 @@ const TodoList = ({ tasks, onCompleteTask, onDeleteTask }) => {
   };
 
   const startTimer = (taskId, time) => {
+    if (time === 0) {
+      return;
+    }
     const timerId = setInterval(() => {
       setTimers((prevTimers) => {
         const updatedTime = prevTimers[taskId]?.time - 1;
-        if (updatedTime <= 0) {
-          // clearInterval(prevTimers[taskId].id);
-          // onCompleteTask(taskId);
-          console.log(22);
+        if (updatedTime === 0) {
+          clearInterval(prevTimers[taskId].id);
         }
         return {
           ...prevTimers,
@@ -27,8 +31,7 @@ const TodoList = ({ tasks, onCompleteTask, onDeleteTask }) => {
         };
       });
     }, 1000);
-    // console.log(prevTimers);
-    const updatedTime2 = time - 60;
+
     setTimers((prevTimers) => ({
       ...prevTimers,
       [taskId]: { id: timerId, time },
@@ -36,70 +39,28 @@ const TodoList = ({ tasks, onCompleteTask, onDeleteTask }) => {
   };
 
   const handleCompleteTask = (taskId) => {
-    clearInterval(timers[taskId]?.id);
     onCompleteTask(taskId);
   };
 
   const handleDeleteTask = (taskId) => {
-    clearInterval(timers[taskId]?.id);
     onDeleteTask(taskId);
   };
-
-  useEffect(() => {
-    const storedTimers = JSON.parse(localStorage.getItem("timers")) || {};
-    setTimers(storedTimers);
-
-    return () => {
-      Object.values(timers).forEach((timer) => clearInterval(timer.id));
-    };
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("timers", JSON.stringify(timers));
-  }, [timers]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTimers((prevTimers) => {
-        const updatedTimers = {};
-        Object.keys(prevTimers).forEach((taskId) => {
-          const updatedTime = prevTimers[taskId].time - 1;
-          if (updatedTime <= 0) {
-            clearInterval(prevTimers[taskId].id);
-            // onCompleteTask(taskId);
-          } else {
-            updatedTimers[taskId] = {
-              ...prevTimers[taskId],
-              time: updatedTime,
-            };
-          }
-        });
-        return updatedTimers;
-      });
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [onCompleteTask]);
 
   return (
     <div>
       <h2>Todo List</h2>
       <ul>
         {tasks?.map((task) => {
-          const timerValue = timers[task.id]?.time || task.time * 60;
+          const timerValue =
+            timers[task.id]?.time !== undefined
+              ? timers[task.id]?.time
+              : task.time * 60;
           const timerStyle = {
             color:
-              timerValue <= 0
-                ? "red"
-                : timerValue <= 600
-                ? "yellow"
-                : "inherit",
+              timerValue <= 0 ? "red" : timerValue < 60 ? "yellow" : "inherit",
           };
           return (
-            <li
-              key={task.id}
-              style={{ backgroundColor: task.isDueSoon ? "yellow" : "bl" }}
-            >
+            <li key={task.id}>
               <span> {task.description}</span>
               <span style={timerStyle}> - Timer: {formatTime(timerValue)}</span>
               <Button onClick={() => startTimer(task.id, timerValue)}>
